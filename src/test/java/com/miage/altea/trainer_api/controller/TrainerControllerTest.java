@@ -1,15 +1,13 @@
 package com.miage.altea.trainer_api.controller;
 
+import com.miage.altea.trainer_api.bo.Trainer;
 import com.miage.altea.trainer_api.service.TrainerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -75,6 +73,35 @@ public class TrainerControllerTest {
         assertArrayEquals(new String[]{"/{name}"}, getMapping.value());
 
         assertNotNull(pathVariableAnnotation);
+    }
+
+    @Test
+    void createTrainer_shouldBeAnnotated() throws NoSuchMethodException {
+        var createTrainer =
+                TrainerController.class.getDeclaredMethod("create", Trainer.class);
+        var postMapping = createTrainer.getAnnotation(PostMapping.class);
+
+        assertNotNull(postMapping);
+    }
+
+    @Test
+    void updateTrainer_shouldBeAnnotated() throws NoSuchMethodException {
+        var updateTrainer =
+                TrainerController.class.getDeclaredMethod("update", Trainer.class, String.class);
+        var putMapping = updateTrainer.getAnnotation(PutMapping.class);
+
+        assertNotNull(putMapping);
+        assertArrayEquals(new String[]{"/{name}"}, putMapping.value());
+    }
+
+    @Test
+    void deleteTrainer_shouldBeAnnotated() throws NoSuchMethodException {
+        var deleteTrainer =
+                TrainerController.class.getDeclaredMethod("deleteById", String.class);
+        var deleteMapping = deleteTrainer.getAnnotation(DeleteMapping.class);
+
+        assertNotNull(deleteMapping);
+        assertArrayEquals(new String[]{"/{name}"}, deleteMapping.value());
     }
 
 }
