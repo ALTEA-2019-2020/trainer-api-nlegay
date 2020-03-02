@@ -1,0 +1,137 @@
+{
+	"info": {
+		"_postman_id": "a3d2bc83-cc8c-4bbd-bdae-757d04c8bdf8",
+		"name": "trainer-api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Liste des dresseurs de Pokemon",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "615fc3c0-43f4-4143-945c-4effe7e317fd",
+						"exec": [
+							"pm.test(\"all trainers\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.length).to.eq(2);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ash\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData[0].name).to.eq(\"Ash\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Misty\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData[1].name).to.eq(\"Misty\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/trainers/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"trainers",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Dresseur de Pokemon",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "615fc3c0-43f4-4143-945c-4effe7e317fd",
+						"exec": [
+							"pm.test(\"Ash\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.name).to.eq(\"Ash\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/trainers/Ash",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"trainers",
+						"Ash"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Créer un dresseur de Pokemon",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "615fc3c0-43f4-4143-945c-4effe7e317fd",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"TestTrainer\",\r\n    \"team\": [\r\n        {\r\n            \"pokemonTypeId\": 25,\r\n            \"level\": 18\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/trainers",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"trainers"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
