@@ -6,6 +6,7 @@ import com.miage.altea.trainer_api.bo.Trainer;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -26,14 +27,30 @@ class TrainerControllerIntegrationTest {
     @Autowired
     private TrainerController controller;
 
+    @Value("${spring.security.user.name}")
+    private String username;
+
+    @Value("${spring.security.user.password}")
+    private String password;
+
     @Test
     void trainerController_shouldBeInstanciated(){
         assertNotNull(controller);
     }
 
     @Test
+    void getTrainers_shouldThrowAnUnauthorized(){
+        var responseEntity = this.restTemplate
+                .getForEntity("http://localhost:" + port + "/trainers/Ash", Trainer.class);
+        assertNotNull(responseEntity);
+        assertEquals(401, responseEntity.getStatusCodeValue());
+    }
+
+    @Test
     void getTrainer_withNameAsh_shouldReturnAsh() {
-        var ash = this.restTemplate.getForObject("http://localhost:" + port + "/trainers/Ash", Trainer.class);
+        var ash = this.restTemplate
+                .withBasicAuth(username, password)
+                .getForObject("http://localhost:" + port + "/trainers/Ash", Trainer.class);
         assertNotNull(ash);
         assertEquals("Ash", ash.getName());
         assertEquals(1, ash.getTeam().size());
@@ -44,7 +61,9 @@ class TrainerControllerIntegrationTest {
 
     @Test
     void getAllTrainers_shouldReturnAshAndMisty() {
-        var trainers = this.restTemplate.getForObject("http://localhost:" + port + "/trainers/", Trainer[].class);
+        var trainers = this.restTemplate
+                .withBasicAuth(username, password)
+                .getForObject("http://localhost:" + port + "/trainers/", Trainer[].class);
         assertNotNull(trainers);
         assertEquals(2, trainers.length);
 
@@ -56,7 +75,9 @@ class TrainerControllerIntegrationTest {
     void addAsh_shouldReturnAsh() throws JSONException, JsonProcessingException {
         Trainer trainer = new Trainer("Bug Catcher");
         trainer.setTeam(Arrays.asList(new Pokemon(13,6)));
-        var bugCatcher = restTemplate.postForObject("http://localhost:" + port + "/trainers/", trainer, Trainer.class);
+        var bugCatcher = restTemplate
+                .withBasicAuth(username, password)
+                .postForObject("http://localhost:" + port + "/trainers/", trainer, Trainer.class);
 
         assertNotNull(bugCatcher);
         assertEquals("Bug Catcher", bugCatcher.getName());
@@ -65,11 +86,18 @@ class TrainerControllerIntegrationTest {
 
     @Test
     void updateAsh_shouldReturnUpdatedAsh() {
-        var trainer = this.restTemplate.getForObject("http://localhost:" + port + "/trainers/Ash", Trainer.class);
+        var trainer = this.restTemplate
+                .withBasicAuth(username, password)
+                .getForObject("http://localhost:" + port + "/trainers/Ash", Trainer.class);
+        assertNotNull(trainer);
         trainer.setTeam(Arrays.asList(new Pokemon(10,6)));
-        restTemplate.put("http://localhost:" + port + "/trainers/", trainer);
+        restTemplate
+                .withBasicAuth(username, password)
+                .put("http://localhost:" + port + "/trainers/Ash", trainer);
 
-        var ash = this.restTemplate.getForObject("http://localhost:" + port + "/trainers/Ash", Trainer.class);
+        var ash = this.restTemplate
+                .withBasicAuth(username, password)
+                .getForObject("http://localhost:" + port + "/trainers/Ash", Trainer.class);
         assertNotNull(ash);
         assertEquals("Ash", ash.getName());
         assertEquals(10, ash.getTeam().get(0).getPokemonTypeId());
@@ -77,9 +105,13 @@ class TrainerControllerIntegrationTest {
 
     @Test
     void removeAsh_shouldReturnNothing() {
-        this.restTemplate.delete("http://localhost:" + port + "/trainers/Ash", Trainer[].class);
+        this.restTemplate
+                .withBasicAuth(username, password)
+                .delete("http://localhost:" + port + "/trainers/Ash", Trainer[].class);
 
-        var NoAsh = this.restTemplate.getForObject("http://localhost:" + port + "/trainers/Ash", Trainer.class);
+        var NoAsh = this.restTemplate
+                .withBasicAuth(username, password)
+                .getForObject("http://localhost:" + port + "/trainers/Ash", Trainer.class);
         assertNull(NoAsh.getName());
     }
 }
